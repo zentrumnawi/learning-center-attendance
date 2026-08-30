@@ -10,7 +10,7 @@ export default defineConfig([
 
   js.configs.recommended,
 
-  ...vue.configs["flat/recommended"],
+  ...vue.configs["flat/strongly-recommended"],
 
   {
     files: ["**/*.vue"],
