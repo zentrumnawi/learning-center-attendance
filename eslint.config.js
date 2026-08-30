@@ -2,44 +2,44 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import js from "@eslint/js";
 import vue from "eslint-plugin-vue";
 import globals from "globals";
-import vueParser from "vue-eslint-parser"
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import vueParser from "vue-eslint-parser";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 export default defineConfig([
-    globalIgnores(["**/dist/**", "**/coverage/**"]),
+  globalIgnores(["**/dist/**", "**/coverage/**"]),
 
-    js.configs.recommended,
+  js.configs.recommended,
 
-    ...vue.configs["flat/recommended"],
+  ...vue.configs["flat/strongly-recommended"],
 
-    {
-        files: ["**/*.vue"],
-        languageOptions: {
-            parser: vueParser,
-        },
-        rules: {
-            "vue/multi-word-component-names": "off",
-        },
+  {
+    files: ["**/*.vue"],
+    languageOptions: {
+      parser: vueParser,
     },
-
-    {
-        files: ["src/**/*.{js,vue}"],
-        languageOptions: {
-            globals: globals.browser,
-        },
+    rules: {
+      "vue/multi-word-component-names": "off",
     },
+  },
 
-    {
-        files: ["*.config.js", "eslint.config.js"],
-        languageOptions: {
-            globals: globals.node,
-        },
+  {
+    files: ["src/**/*.{js,vue}"],
+    languageOptions: {
+      globals: globals.browser,
     },
+  },
 
-    {
-        rules: {
-            "no-console": "off",
-        },
+  {
+    files: ["*.config.js", "eslint.config.js"],
+    languageOptions: {
+      globals: globals.node,
     },
-    eslintPluginPrettierRecommended,
+  },
+
+  {
+    rules: {
+      "no-console": "off",
+    },
+  },
+  eslintPluginPrettierRecommended,
 ]);
