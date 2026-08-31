@@ -151,8 +151,9 @@
 <script>
 import { Parser } from "@json2csv/plainjs";
 import { format, addMinutes, differenceInMinutes } from "date-fns";
-import { mapGetters } from "vuex";
-import configuration from '../assets/courses_ws.json';
+import { mapActions, mapState } from "pinia";
+import configuration from "../assets/courses_ws.json";
+import { useAttendeesStore } from "@/stores/attendees";
 
 export default {
   config: configuration,
@@ -210,19 +211,20 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useAttendeesStore, ["clearAttendees", "populatedb"]),
     authenticate() {
         if (this.password != this.requiredPassword) return;
         this.authenticated = true;
     },
     select(course) {
-       this.$store.state.faculties_act.push(course)
+      this.faculties_act.push(course);
     },
     clearlist() {     
-      this.$store.dispatch("clearlist")
-      this.clearconfirm = false
+      this.clearAttendees();
+      this.clearconfirm = false;
     },
     dummydata() {
-      this.$store.dispatch("dummydata")
+      this.populatedb();
     },
     format(Attendee) {
       Attendee.map(element => ({ ...element, ...this.formatDates(element) }));  
@@ -233,7 +235,7 @@ export default {
 
       return {
         presence: format(differenceDate,'HH:mm'),
-        date: format(element.start, 'DD.MM.YYYY'),
+        date: format(element.start, 'dd.MM.yyyy'),
         start: format(element.start,'HH:mm'),
         end: format(element.end,'HH:mm'),
         courses: element.courses.join(', ')
@@ -275,7 +277,7 @@ export default {
 
   },
   computed: {
-    ...mapGetters({ attendees: "attendees" }),
+    ...mapState(useAttendeesStore, ["attendees", "faculties_act"]),
     export() {
 
       this.attendees.forEach(attendee => {

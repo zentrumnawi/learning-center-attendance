@@ -207,9 +207,10 @@
 
 <script>
 import { format, subHours, subMinutes, setMinutes, setHours, isBefore } from "date-fns";
+import { mapActions } from "pinia";
 import TimeInput from "@/components/TimeInput.vue";
-import { v4 as uuidv4 } from 'uuid';
 import configuration from '../assets/courses_ws.json'
+import { useAttendeesStore } from "@/stores/attendees";
 
 function initializeForm() {
   return {
@@ -269,7 +270,7 @@ export default {
     // Create an interval to update current time every 1000ms
     this.interval = setInterval(() => this.setEndTime(), 1000);
   },
-  destroyed() {
+  unmounted() {
     // Cleanup interval when we leave the page.
     clearInterval(this.interval);
   },
@@ -286,6 +287,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useAttendeesStore, ["saveAttendee"]),
     setEndTime() {
       this.form.end = new Date();
     },
@@ -326,10 +328,7 @@ export default {
       this.$refs.form_coursemath.resetValidation();
     },
     submit() {
-      this.$store.dispatch("submitForm", {
-        ...this.localizedForm,
-        id: uuidv4()
-      });
+      this.saveAttendee(this.localizedForm);
       this.form = initializeForm();
       this.$refs.form_studinfo.resetValidation();
       this.$refs.form_coursemath.resetValidation();
