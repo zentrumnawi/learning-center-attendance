@@ -3,7 +3,7 @@
     ref="menu"
     v-model="menu"
     :close-on-content-click="false"
-    :return-value.sync="time"
+    v-model:return-value="time"
     lazy
     transition="scale-transition"
     offset-y
@@ -38,33 +38,33 @@ import { format } from "date-fns";
 export default {
   name: "TimeInput",
   data: () => ({
-    menu: false
+    menu: false,
   }),
   props: {
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     label: {
       type: String,
-      default: null
+      default: null,
     },
     min: {
       type: String,
-      default: "08:00"
+      default: "08:00",
     },
     max: {
       type: String,
-      default: null
+      default: null,
     },
     rules: {
       type: Array,
-      default: null
+      default: null,
     },
     modelValue: {
       type: Date,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     time: {
@@ -72,12 +72,14 @@ export default {
         return format(this.modelValue, "HH:mm");
       },
       set(val) {
-        const [year, month, day] = format(this.modelValue, "yyyy-MM-dd").split("-");
+        const [year, month, day] = format(this.modelValue, "yyyy-MM-dd").split(
+          "-",
+        );
         const [hours, minutes] = val.split(":");
         const date = new Date(year, month - 1, day, hours, minutes);
         this.$emit("update:modelValue", date);
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>

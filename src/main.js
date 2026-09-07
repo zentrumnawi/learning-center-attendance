@@ -1,50 +1,46 @@
-import { createApp } from 'vue'
-import { createRouter, createWebHashHistory } from 'vue-router'
-//import Vuetify from 'vuetify'
-import 'vuetify/dist/vuetify.min.css' // Ensure you are using css-loader
-import * as VeeValidate from 'vee-validate';
-import { DataTable } from 'v-data-table'
-import { store } from './store/store'
-import { Parser } from '@json2csv/plainjs'
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+import { createRouter, createWebHashHistory } from "vue-router";
+import "vuetify/dist/vuetify.min.css"; // Ensure you are using css-loader
+import "vuetify/styles";
+import { createVuetify } from "vuetify";
+import "@mdi/font/css/materialdesignicons.css";
+import { aliases, mdi } from "vuetify/iconsets/mdi";
 
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import { md } from 'vuetify/iconsets/md'
-
-import App from './App.vue'
-import Admin from '@/components/Admin.vue'
-import Form from '@/components/AttendeeForm.vue'
+import App from "./App.vue";
+import Admin from "@/components/Admin.vue";
+import Form from "@/components/AttendeeForm.vue";
 
 const vuetify = createVuetify({
   icons: {
-    defaultSet: 'md',
+    defaultSet: "mdi",
+    aliases,
     sets: {
-      md,
+      mdi,
     },
   },
-})
+});
 
 const routes = [
   {
-      path: '/admin',
-      name: 'Admin',
-      component: Admin
+    path: "/admin",
+    name: "Admin",
+    component: Admin,
   },
   {
-      path: '/',
-      name: 'Form',
-      component: Form
-  }
+    path: "/add-student",
+    name: "Form",
+    component: Form,
+  },
 ];
+
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 export const router = createRouter({
   history: createWebHashHistory(),
   routes,
-})
+});
 
-createApp(App)
-      .use(router)
-      .use(store)
-      .use(vuetify)
-      .mount('#app')
-
+createApp(App).use(router).use(pinia).use(vuetify).mount("#app");

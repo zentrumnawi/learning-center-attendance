@@ -1,7 +1,9 @@
 <template>
   <v-app>
     <v-toolbar app dark color="primary darken-1">
-      <v-toolbar-title class="headline text-uppercase">Anwesenheitsformular</v-toolbar-title>
+      <v-toolbar-title class="headline text-uppercase"
+        >Anwesenheitsformular</v-toolbar-title
+      >
       <v-spacer></v-spacer>
       <v-img
         aspect-ratio="1.5"
@@ -21,8 +23,11 @@
         <v-col xs12>
           &copy; 2019&nbsp;&nbsp;|&nbsp;&nbsp;
           <router-link to="/admin">
-            <img height="20px" src="/Icon_ZentrumNaturwissenschaften.svg" />
-          </router-link>&nbsp;&nbsp;
+            <img
+              height="20px"
+              src="/Icon_ZentrumNaturwissenschaften.svg"
+            /> </router-link
+          >&nbsp;&nbsp;
           <strong>Zentrum Naturwissenschaften</strong>
         </v-col>
       </v-layout>
@@ -32,6 +37,6 @@
 
 <script>
 export default {
-  name: "app"
+  name: "app",
 };
 </script>
