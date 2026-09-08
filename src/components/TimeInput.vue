@@ -16,7 +16,7 @@
         v-bind="props"
         :label="label"
         readonly
-        prepend-icon="access_time"
+        prepend-icon="mdi-timelapse"
       ></v-text-field>
     </template>
 
