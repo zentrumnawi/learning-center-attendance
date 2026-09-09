@@ -1,16 +1,13 @@
 <template>
   <v-menu
-    ref="menu"
     v-model="menu"
     :close-on-content-click="false"
-    v-model:return-value="time"
-    lazy
+    location="bottom"
     transition="scale-transition"
-    offset-y
     :max-width="290"
     :disabled="disabled"
   >
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-text-field
         v-model="time"
         v-bind="props"
@@ -22,12 +19,11 @@
 
     <v-time-picker
       v-if="menu"
-      no-title
       v-model="time"
       format="24hr"
-      @click:minute="$refs.menu.save(time)"
       :min="min"
       :max="max"
+      @update:minute="menu = false"
     ></v-time-picker>
   </v-menu>
 </template>
@@ -66,6 +62,7 @@ export default {
       required: true,
     },
   },
+  emits: ["update:modelValue"],
   computed: {
     time: {
       get() {
