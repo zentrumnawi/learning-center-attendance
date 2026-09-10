@@ -1,6 +1,6 @@
 <template>
-  <v-stepper v-model="stepper" :items="steps" item-title="label" hideActions>
-    <template v-slot:[`item.1`]>
+  <v-stepper v-model="stepper" :items="steps" item-title="label" hide-actions>
+    <template #[`item.1`]>
       <v-form ref="form_studinfo" v-model="valid">
         <v-card>
           <v-card-text>
@@ -57,7 +57,7 @@
       </v-dialog>
     </template>
 
-    <template v-slot:[`item.2`]>
+    <template #[`item.2`]>
       <v-form ref="form_coursemath" v-model="valid2">
         <v-card>
           <v-card-title class="justify-center">
@@ -136,7 +136,7 @@
       </v-form>
     </template>
 
-    <template v-slot:[`item.3`]>
+    <template #[`item.3`]>
       <v-card>
         <v-card-text>
           <time-input
