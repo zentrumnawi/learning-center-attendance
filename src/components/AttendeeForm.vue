@@ -145,7 +145,12 @@
             label="Startzeit"
             required
           ></time-input>
-          <time-input v-model="form.end" label="Endzeit" required></time-input>
+          <time-input
+            v-model="form.end"
+            :min="minEndTime"
+            label="Endzeit"
+            required
+          ></time-input>
           <v-textarea
             v-model="form.comments"
             label="Kommentarfeld"
@@ -230,6 +235,7 @@ import {
   setMinutes,
   setHours,
   isBefore,
+  addMinutes,
 } from "date-fns";
 import { mapActions } from "pinia";
 import TimeInput from "@/components/TimeInput.vue";
@@ -298,6 +304,9 @@ export default {
   computed: {
     maxStartTime() {
       return format(subMinutes(this.form.end, 10), "HH:mm");
+    },
+    minEndTime() {
+      return format(addMinutes(this.form.start, 10), "HH:mm");
     },
     localizedForm() {
       return {
