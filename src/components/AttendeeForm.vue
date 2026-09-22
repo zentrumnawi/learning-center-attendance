@@ -1,6 +1,6 @@
 <template>
-  <v-stepper v-model="stepper" :items="steps" item-title="label" hideActions>
-    <template v-slot:[`item.1`]>
+  <v-stepper v-model="stepper" :items="steps" item-title="label" hide-actions>
+    <template #[`item.1`]>
       <v-form ref="form_studinfo" v-model="valid">
         <v-card>
           <v-card-text>
@@ -57,7 +57,7 @@
       </v-dialog>
     </template>
 
-    <template v-slot:[`item.2`]>
+    <template #[`item.2`]>
       <v-form ref="form_coursemath" v-model="valid2">
         <v-card>
           <v-card-title class="justify-center">
@@ -136,7 +136,7 @@
       </v-form>
     </template>
 
-    <template v-slot:[`item.3`]>
+    <template #[`item.3`]>
       <v-card>
         <v-card-text>
           <time-input
@@ -145,7 +145,12 @@
             label="Startzeit"
             required
           ></time-input>
-          <time-input v-model="form.end" label="Jetzt" disabled></time-input>
+          <time-input
+            v-model="form.end"
+            :min="minEndTime"
+            label="Endzeit"
+            required
+          ></time-input>
           <v-textarea
             v-model="form.comments"
             label="Kommentarfeld"
@@ -230,6 +235,7 @@ import {
   setMinutes,
   setHours,
   isBefore,
+  addMinutes,
 } from "date-fns";
 import { mapActions } from "pinia";
 import TimeInput from "@/components/TimeInput.vue";
@@ -269,7 +275,6 @@ export default {
           completed: false,
         },
       ],
-      interval: null,
       form: initializeForm(),
       courses_selected: [],
       semester: ["1", "2", "3", "4", "5", "6", "7+"],
@@ -296,17 +301,12 @@ export default {
       },
     };
   },
-  created() {
-    // Create an interval to update current time every 1000ms
-    this.interval = setInterval(() => this.setEndTime(), 1000);
-  },
-  unmounted() {
-    // Cleanup interval when we leave the page.
-    clearInterval(this.interval);
-  },
   computed: {
     maxStartTime() {
       return format(subMinutes(this.form.end, 10), "HH:mm");
+    },
+    minEndTime() {
+      return format(addMinutes(this.form.start, 10), "HH:mm");
     },
     localizedForm() {
       return {
@@ -318,9 +318,6 @@ export default {
   },
   methods: {
     ...mapActions(useAttendeesStore, ["saveAttendee"]),
-    setEndTime() {
-      this.form.end = new Date();
-    },
     formatTime(time) {
       return format(time, "HH:mm");
     },
