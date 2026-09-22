@@ -18,7 +18,7 @@
 
             <v-select
               v-model="form.semester"
-              :rules="rules.time"
+              :rules="rules.semester"
               :items="semester"
               label="Fachsemester"
               required
