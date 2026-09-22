@@ -331,14 +331,14 @@ export default {
       this.stepper -= 1;
       this.$refs.form_coursemath.resetValidation();
     },
-    submit() {
+    async submit() {
       this.saveAttendee(this.localizedForm);
       this.form = initializeForm();
-      this.$refs.form_studinfo.resetValidation();
-      this.$refs.form_coursemath.resetValidation();
       this.dialog = false;
       this.valid = false;
       this.stepper = 1;
+      await this.$nextTick();
+      this.$refs.form_studinfo.resetValidation();
     },
   },
 };
