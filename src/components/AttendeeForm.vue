@@ -339,6 +339,7 @@ export default {
       this.stepper = 1;
       await this.$nextTick();
       this.$refs.form_studinfo.resetValidation();
+      this.$refs.form_coursemath.resetValidation();
     },
   },
 };
