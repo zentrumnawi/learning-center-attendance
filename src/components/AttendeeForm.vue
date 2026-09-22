@@ -18,7 +18,7 @@
 
             <v-select
               v-model="form.semester"
-              :rules="rules.time"
+              :rules="rules.semester"
               :items="semester"
               label="Fachsemester"
               required
@@ -324,44 +324,22 @@ export default {
     formatCourselist(courselist) {
       return courselist.join(", ");
     },
-    validate() {
-      if (this.stepper == 2) {
-        this.$refs.form_coursemath.validate();
-
-        if (this.valid2 && this.form.courses.length > 0) {
-          this.$refs.form_coursemath.resetValidation();
-          return true;
-        }
-      }
-
-      if (this.stepper == 1) {
-        this.$refs.form_studinfo.validate();
-
-        if (this.valid) {
-          this.$refs.form_studinfo.resetValidation();
-          return true;
-        }
-      }
-
-      return false;
-    },
     next() {
-      this.validate();
-
       this.stepper += 1;
     },
     previous() {
       this.stepper -= 1;
       this.$refs.form_coursemath.resetValidation();
     },
-    submit() {
+    async submit() {
       this.saveAttendee(this.localizedForm);
       this.form = initializeForm();
-      this.$refs.form_studinfo.resetValidation();
-      this.$refs.form_coursemath.resetValidation();
       this.dialog = false;
       this.valid = false;
       this.stepper = 1;
+      await this.$nextTick();
+      this.$refs.form_studinfo.resetValidation();
+      this.$refs.form_coursemath.resetValidation();
     },
   },
 };
