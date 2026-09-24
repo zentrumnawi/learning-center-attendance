@@ -78,7 +78,7 @@
             >
               <template #item="{ item, props }">
                 <v-list-item v-bind="props">
-                  <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                  ({{ item.raw.department_name }})
                 </v-list-item>
               </template>
             </v-select>
@@ -102,7 +102,7 @@
             >
               <template #item="{ item, props }">
                 <v-list-item v-bind="props">
-                  <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+                  ({{ item.raw.department_name }})
                 </v-list-item>
               </template>
             </v-select>
