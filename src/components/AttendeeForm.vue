@@ -67,26 +67,18 @@
           <v-card-text>
             <v-select
               v-model="form.courses"
-              :items="this.$options.config.courses_math"
+              :items="courses"
               :rules="rules.course"
               chips
               closable-chips
               label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
               item-title="name"
-              item-value="tag"
+              item-value="id"
               multiple
             >
               <template #item="{ item, props }">
                 <v-list-item v-bind="props">
-                  <template v-if="typeof item.raw !== 'object'">
-                    {{ item.raw }}
-                  </template>
-                  <template v-else>
-                    <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                    <v-list-item-subtitle>{{
-                      item.raw.group
-                    }}</v-list-item-subtitle>
-                  </template>
+                  <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
                 </v-list-item>
               </template>
             </v-select>
@@ -99,28 +91,18 @@
           <v-card-text>
             <v-select
               v-model="form.courses"
-              :items="this.$options.config.courses_physics"
+              :items="courses"
               :rules="rules.course"
               chips
               closable-chips
               label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
               item-title="name"
-              item-value="tag"
+              item-value="id"
               multiple
             >
               <template #item="{ item, props }">
                 <v-list-item v-bind="props">
-                  <template v-if="typeof item !== 'object'">
-                    <v-list-item>{{ item }}</v-list-item>
-                  </template>
-                  <template v-else>
-                    <v-list-item>
-                      <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                      <v-list-item-subtitle>{{
-                        item.raw.group
-                      }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </template>
+                  <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
                 </v-list-item>
               </template>
             </v-select>
@@ -237,10 +219,11 @@ import {
   isBefore,
   addMinutes,
 } from "date-fns";
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import TimeInput from "@/components/TimeInput.vue";
 import configuration from "../assets/courses_ws.json";
 import { useAttendeesStore } from "@/stores/attendees";
+import { useCoursesStore } from "@/stores/courses";
 
 function initializeForm() {
   return {
@@ -302,6 +285,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(useCoursesStore, ["courses"]),
     maxStartTime() {
       return format(subMinutes(this.form.end, 10), "HH:mm");
     },
@@ -316,8 +300,12 @@ export default {
       };
     },
   },
+  created() {
+    this.fetchCourses();
+  },
   methods: {
     ...mapActions(useAttendeesStore, ["saveAttendee"]),
+    ...mapActions(useCoursesStore, ["fetchCourses"]),
     formatTime(time) {
       return format(time, "HH:mm");
     },
