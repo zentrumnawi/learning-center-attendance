@@ -66,6 +66,7 @@
 
           <v-card-text>
             <v-select
+              :disabled="form.generalQuestion"
               v-model="form.courses"
               :items="courses"
               :rules="rules.course"
@@ -82,6 +83,11 @@
                 </v-list-item>
               </template>
             </v-select>
+            <v-checkbox
+              :disabled="form.courses.length > 0"
+              v-model="form.generalQuestion"
+              label="Allgemeine Frage, keine spezielle Lehrveranstaltung"
+            ></v-checkbox>
           </v-card-text>
 
           <v-card-actions>
@@ -212,6 +218,7 @@ function initializeForm() {
     semester: "",
     courses: [],
     comments: "",
+    generalQuestion: false,
   };
 }
 export default {
