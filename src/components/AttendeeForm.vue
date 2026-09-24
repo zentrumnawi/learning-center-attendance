@@ -61,31 +61,7 @@
       <v-form ref="form_coursemath" v-model="valid2">
         <v-card>
           <v-card-title class="justify-center">
-            <h2>Mathematik</h2>
-          </v-card-title>
-
-          <v-card-text>
-            <v-select
-              v-model="form.courses"
-              :items="courses"
-              :rules="rules.course"
-              chips
-              closable-chips
-              label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
-              item-title="name"
-              item-value="id"
-              multiple
-            >
-              <template #item="{ item, props }">
-                <v-list-item v-bind="props">
-                  ({{ item.raw.department_name }})
-                </v-list-item>
-              </template>
-            </v-select>
-          </v-card-text>
-
-          <v-card-title class="justify-center">
-            <h2>Physik</h2>
+            <h2>Lehrveranstaltung(en)</h2>
           </v-card-title>
 
           <v-card-text>
