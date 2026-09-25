@@ -293,7 +293,12 @@ export default {
       return format(time, "HH:mm");
     },
     formatCourselist(courselist) {
-      return courselist.join(", ");
+      if (this.form.generalQuestion) {
+        return "Allgemeine Frage, keine spezielle Lehrveranstaltung";
+      }
+      return courselist
+        .map((course) => this.courses.find((c) => c.id === course).name)
+        .join(", ");
     },
     next() {
       this.stepper += 1;
