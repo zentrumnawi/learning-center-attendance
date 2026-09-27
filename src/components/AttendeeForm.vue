@@ -69,7 +69,6 @@
               :disabled="form.generalQuestion"
               v-model="form.courses"
               :items="courses"
-              :rules="rules.course"
               chips
               closable-chips
               label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
@@ -255,11 +254,6 @@ export default {
           (v) => v.length === 8 || "Ihre ID muss 8 Zeichen lang sein",
         ],
         time: [(v) => !!v || "Bitte geben Sie Ihre Anwesenheitszeit an"],
-        course: [
-          (v) =>
-            v.length > 0 ||
-            "Bitte wählen Sie mindestens eine Lehrveranstaltung aus",
-        ],
         semester: [
           (v) => !!v || "Bitte geben Sie Ihr aktuelles Fachsemester an",
         ],
