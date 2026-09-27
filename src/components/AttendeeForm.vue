@@ -9,7 +9,7 @@
               :rules="rules.pid"
               maxlength="8"
               label="ID"
-              append-icon="help"
+              append-icon="mdi-help-circle"
               persistent-hint
               placeholder="XX999999"
               required
