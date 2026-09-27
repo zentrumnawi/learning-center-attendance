@@ -26,10 +26,12 @@
 
             <v-select
               v-model="form.faculty"
-              :items="faculties"
+              :items="departments"
               :rules="rules.faculty"
               label="Studiengang"
               required
+              item-title="name"
+              item-value="name"
             ></v-select>
           </v-card-text>
 
@@ -204,6 +206,7 @@ import { mapActions, mapState } from "pinia";
 import TimeInput from "@/components/TimeInput.vue";
 import { useAttendeesStore } from "@/stores/attendees";
 import { useCoursesStore } from "@/stores/courses";
+import { useDepartmentsStore } from "@/stores/departments";
 
 function initializeForm() {
   return {
@@ -224,33 +227,6 @@ export default {
   data: function () {
     return {
       stepper: 0,
-      faculties: [
-        "Mathematik",
-        "Informatik",
-        "Naturwissenschaften",
-        "Chemie",
-        "Pharmazie",
-        "Physik",
-        "Biologie",
-        "Medizin",
-        "Zahnmedizin",
-        "Pharmazeutische Chemie",
-        "Atmosphärenphysik",
-        "Geophysik",
-        "Chemische Meteorologie",
-        "Informatik",
-        "Naturwissenschaften",
-        "Chemie",
-        "Pharmazie",
-        "Physik",
-        "Biologie",
-        "Medizin",
-        "Zahnmedizin",
-        "Pharmazeutische Chemie",
-        "Atmosphärenphysik",
-        "Geophysik",
-        "Chemische Meteorologie",
-      ],
       steps: [
         {
           label: "Persönliche ID",
@@ -288,6 +264,7 @@ export default {
   },
   computed: {
     ...mapState(useCoursesStore, ["courses"]),
+    ...mapState(useDepartmentsStore, ["departments"]),
     maxStartTime() {
       return format(subMinutes(this.form.end, 10), "HH:mm");
     },
@@ -304,10 +281,12 @@ export default {
   },
   created() {
     this.fetchCourses();
+    this.fetchDepartments();
   },
   methods: {
     ...mapActions(useAttendeesStore, ["saveAttendee"]),
     ...mapActions(useCoursesStore, ["fetchCourses"]),
+    ...mapActions(useDepartmentsStore, ["fetchDepartments"]),
     formatTime(time) {
       return format(time, "HH:mm");
     },
