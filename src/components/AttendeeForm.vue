@@ -26,7 +26,7 @@
 
             <v-select
               v-model="form.faculty"
-              :items="this.$options.config.faculties"
+              :items="faculties"
               :rules="rules.faculty"
               label="Studiengang"
               required
@@ -202,7 +202,6 @@ import {
 } from "date-fns";
 import { mapActions, mapState } from "pinia";
 import TimeInput from "@/components/TimeInput.vue";
-import configuration from "../assets/courses_ws.json";
 import { useAttendeesStore } from "@/stores/attendees";
 import { useCoursesStore } from "@/stores/courses";
 
@@ -221,11 +220,37 @@ function initializeForm() {
   };
 }
 export default {
-  config: configuration,
   components: { TimeInput },
   data: function () {
     return {
       stepper: 0,
+      faculties: [
+        "Mathematik",
+        "Informatik",
+        "Naturwissenschaften",
+        "Chemie",
+        "Pharmazie",
+        "Physik",
+        "Biologie",
+        "Medizin",
+        "Zahnmedizin",
+        "Pharmazeutische Chemie",
+        "Atmosphärenphysik",
+        "Geophysik",
+        "Chemische Meteorologie",
+        "Informatik",
+        "Naturwissenschaften",
+        "Chemie",
+        "Pharmazie",
+        "Physik",
+        "Biologie",
+        "Medizin",
+        "Zahnmedizin",
+        "Pharmazeutische Chemie",
+        "Atmosphärenphysik",
+        "Geophysik",
+        "Chemische Meteorologie",
+      ],
       steps: [
         {
           label: "Persönliche ID",
