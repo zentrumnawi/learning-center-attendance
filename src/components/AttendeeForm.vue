@@ -5,6 +5,15 @@
         <v-card>
           <v-card-text>
             <v-text-field
+              v-model="form.cardId"
+              label="Card-ID"
+              readonly
+              persistent-hint
+              hint="Wird vom RFID-Kiosk übernommen"
+              placeholder="Keine Karte gescannt"
+            ></v-text-field>
+
+            <v-text-field
               v-model="form.pid"
               :rules="rules.pid"
               maxlength="8"
@@ -171,6 +180,12 @@
 
               <v-list>
                 <v-list-item>
+                  <v-list-item-subtitle>Card-ID</v-list-item-subtitle>
+                  <v-list-item-title>{{
+                    form.cardId || "—"
+                  }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
                   <v-list-item-subtitle>ID</v-list-item-subtitle>
                   <v-list-item-title>{{ form.pid }}</v-list-item-title>
                 </v-list-item>
@@ -241,9 +256,11 @@ import { mapActions } from "pinia";
 import TimeInput from "@/components/TimeInput.vue";
 import configuration from "../assets/courses_ws.json";
 import { useAttendeesStore } from "@/stores/attendees";
+import { useRfidStore } from "@/stores/rfid";
 
-function initializeForm() {
+function initializeForm(cardId = "") {
   return {
+    cardId,
     pid: "",
     start: isBefore(setHours(new Date(), 8), subHours(new Date(), 2))
       ? subHours(new Date(), 2)
@@ -259,6 +276,7 @@ export default {
   config: configuration,
   components: { TimeInput },
   data: function () {
+    const rfidStore = useRfidStore();
     return {
       stepper: 0,
       steps: [
@@ -275,7 +293,7 @@ export default {
           completed: false,
         },
       ],
-      form: initializeForm(),
+      form: initializeForm(rfidStore.cardId),
       courses_selected: [],
       semester: ["1", "2", "3", "4", "5", "6", "7+"],
       dialog: false,
@@ -333,6 +351,7 @@ export default {
     },
     async submit() {
       this.saveAttendee(this.localizedForm);
+      useRfidStore().clearCardId();
       this.form = initializeForm();
       this.dialog = false;
       this.valid = false;
