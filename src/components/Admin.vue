@@ -98,7 +98,7 @@
       <v-tab-item>
         <v-card>
           <v-data-table
-            :items="$options.config.courses_math"
+            :items="courses_math"
             :headers="course_headers"
             class="elevation-1"
             hide-actions
@@ -115,7 +115,7 @@
       <v-tab-item>
         <v-card>
           <v-data-table
-            :items="$options.config.courses_physics"
+            :items="courses_physics"
             :headers="course_headers"
             class="elevation-1"
             hide-actions
@@ -132,7 +132,7 @@
       <v-tab-item>
         <v-card>
           <v-data-table
-            :items="$options.config.faculties"
+            :items="faculties"
             :headers="faculty_headers"
             class="elevation-1"
             hide-actions
@@ -151,11 +151,9 @@
 import { Parser } from "@json2csv/plainjs";
 import { format, addMinutes, differenceInMinutes } from "date-fns";
 import { mapActions, mapState } from "pinia";
-import configuration from "../assets/courses_ws.json";
 import { useAttendeesStore } from "@/stores/attendees";
 
 export default {
-  config: configuration,
   data: function () {
     return {
       authenticated: false,
@@ -193,6 +191,24 @@ export default {
       faculty_headers: [{ text: "Studienfach", value: "name" }],
       crs_headers: [],
       csv_flds: [],
+      faculties: [
+        "Physik",
+        "Biologie",
+        "Medizin",
+        "Zahnmedizin",
+        "Pharmazeutische Chemie",
+        "Atmosphärenphysik",
+        "Geophysik",
+        "Chemische Meteorologie",
+        "Informatik",
+        "Zahnmedizin",
+        "Pharmazeutische Chemie",
+        "Atmosphärenphysik",
+        "Geophysik",
+        "Chemische Meteorologie",
+      ],
+      courses_math: [],
+      courses_physics: [],
     };
   },
   props: {
