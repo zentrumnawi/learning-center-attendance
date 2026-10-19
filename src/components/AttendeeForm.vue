@@ -18,7 +18,7 @@
               :rules="rules.pid"
               maxlength="8"
               label="ID"
-              append-icon="help"
+              append-icon="mdi-help-circle"
               persistent-hint
               placeholder="XX999999"
               required
@@ -35,10 +35,12 @@
 
             <v-select
               v-model="form.faculty"
-              :items="this.$options.config.faculties"
+              :items="departments"
               :rules="rules.faculty"
               label="Studiengang"
               required
+              item-title="name"
+              item-value="name"
             ></v-select>
           </v-card-text>
 
@@ -70,69 +72,32 @@
       <v-form ref="form_coursemath" v-model="valid2">
         <v-card>
           <v-card-title class="justify-center">
-            <h2>Mathematik</h2>
+            <h2>Lehrveranstaltung(en)</h2>
           </v-card-title>
 
           <v-card-text>
             <v-select
+              :disabled="form.generalQuestion"
               v-model="form.courses"
-              :items="this.$options.config.courses_math"
-              :rules="rules.course"
+              :items="courses"
               chips
               closable-chips
               label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
               item-title="name"
-              item-value="tag"
+              item-value="id"
               multiple
             >
               <template #item="{ item, props }">
                 <v-list-item v-bind="props">
-                  <template v-if="typeof item.raw !== 'object'">
-                    {{ item.raw }}
-                  </template>
-                  <template v-else>
-                    <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                    <v-list-item-subtitle>{{
-                      item.raw.group
-                    }}</v-list-item-subtitle>
-                  </template>
+                  ({{ item.raw.department_name }})
                 </v-list-item>
               </template>
             </v-select>
-          </v-card-text>
-
-          <v-card-title class="justify-center">
-            <h2>Physik</h2>
-          </v-card-title>
-
-          <v-card-text>
-            <v-select
-              v-model="form.courses"
-              :items="this.$options.config.courses_physics"
-              :rules="rules.course"
-              chips
-              closable-chips
-              label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
-              item-title="name"
-              item-value="tag"
-              multiple
-            >
-              <template #item="{ item, props }">
-                <v-list-item v-bind="props">
-                  <template v-if="typeof item !== 'object'">
-                    <v-list-item>{{ item }}</v-list-item>
-                  </template>
-                  <template v-else>
-                    <v-list-item>
-                      <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
-                      <v-list-item-subtitle>{{
-                        item.raw.group
-                      }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </template>
-                </v-list-item>
-              </template>
-            </v-select>
+            <v-checkbox
+              :disabled="form.courses.length > 0"
+              v-model="form.generalQuestion"
+              label="Allgemeine Frage, keine spezielle Lehrveranstaltung"
+            ></v-checkbox>
           </v-card-text>
 
           <v-card-actions>
@@ -252,11 +217,12 @@ import {
   isBefore,
   addMinutes,
 } from "date-fns";
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import TimeInput from "@/components/TimeInput.vue";
-import configuration from "../assets/courses_ws.json";
 import { useAttendeesStore } from "@/stores/attendees";
 import { useRfidStore } from "@/stores/rfid";
+import { useCoursesStore } from "@/stores/courses";
+import { useDepartmentsStore } from "@/stores/departments";
 
 function initializeForm(cardId = "") {
   return {
@@ -270,10 +236,10 @@ function initializeForm(cardId = "") {
     semester: "",
     courses: [],
     comments: "",
+    generalQuestion: false,
   };
 }
 export default {
-  config: configuration,
   components: { TimeInput },
   data: function () {
     const rfidStore = useRfidStore();
@@ -307,11 +273,6 @@ export default {
           (v) => v.length === 8 || "Ihre ID muss 8 Zeichen lang sein",
         ],
         time: [(v) => !!v || "Bitte geben Sie Ihre Anwesenheitszeit an"],
-        course: [
-          (v) =>
-            v.length > 0 ||
-            "Bitte wählen Sie mindestens eine Lehrveranstaltung aus",
-        ],
         semester: [
           (v) => !!v || "Bitte geben Sie Ihr aktuelles Fachsemester an",
         ],
@@ -320,6 +281,8 @@ export default {
     };
   },
   computed: {
+    ...mapState(useCoursesStore, ["courses"]),
+    ...mapState(useDepartmentsStore, ["departments"]),
     maxStartTime() {
       return format(subMinutes(this.form.end, 10), "HH:mm");
     },
@@ -334,13 +297,24 @@ export default {
       };
     },
   },
+  created() {
+    this.fetchCourses();
+    this.fetchDepartments();
+  },
   methods: {
     ...mapActions(useAttendeesStore, ["saveAttendee"]),
+    ...mapActions(useCoursesStore, ["fetchCourses"]),
+    ...mapActions(useDepartmentsStore, ["fetchDepartments"]),
     formatTime(time) {
       return format(time, "HH:mm");
     },
     formatCourselist(courselist) {
-      return courselist.join(", ");
+      if (this.form.generalQuestion) {
+        return "Allgemeine Frage, keine spezielle Lehrveranstaltung";
+      }
+      return courselist
+        .map((course) => this.courses.find((c) => c.id === course).name)
+        .join(", ");
     },
     next() {
       this.stepper += 1;
