@@ -223,17 +223,19 @@ import { useAttendeesStore } from "@/stores/attendees";
 import { useRfidStore } from "@/stores/rfid";
 import { useCoursesStore } from "@/stores/courses";
 import { useDepartmentsStore } from "@/stores/departments";
+import { mapParticipantToFormFields } from "@/api/attendees";
 
-function initializeForm(cardId = "") {
+function initializeForm(cardId = "", participant = null, departments = []) {
+  const prefill = mapParticipantToFormFields(participant, departments);
   return {
-    cardId,
+    cardId: cardId || prefill.cardId || "",
     pid: "",
     start: isBefore(setHours(new Date(), 8), subHours(new Date(), 2))
       ? subHours(new Date(), 2)
       : setHours(setMinutes(new Date(), 0), 8),
     end: new Date(),
-    faculty: null,
-    semester: "",
+    faculty: prefill.faculty,
+    semester: prefill.semester,
     courses: [],
     comments: "",
     generalQuestion: false,
@@ -259,7 +261,7 @@ export default {
           completed: false,
         },
       ],
-      form: initializeForm(rfidStore.cardId),
+      form: initializeForm(rfidStore.cardId, rfidStore.participant),
       courses_selected: [],
       semester: ["1", "2", "3", "4", "5", "6", "7+"],
       dialog: false,
@@ -297,14 +299,26 @@ export default {
       };
     },
   },
-  created() {
-    this.fetchCourses();
-    this.fetchDepartments();
+  async created() {
+    await Promise.all([this.fetchCourses(), this.fetchDepartments()]);
+    this.applyParticipantPrefill();
   },
   methods: {
     ...mapActions(useAttendeesStore, ["saveAttendee"]),
     ...mapActions(useCoursesStore, ["fetchCourses"]),
     ...mapActions(useDepartmentsStore, ["fetchDepartments"]),
+    applyParticipantPrefill() {
+      const rfidStore = useRfidStore();
+      if (!rfidStore.participant) {
+        this.form = initializeForm(rfidStore.cardId);
+        return;
+      }
+      this.form = initializeForm(
+        rfidStore.cardId,
+        rfidStore.participant,
+        this.departments,
+      );
+    },
     formatTime(time) {
       return format(time, "HH:mm");
     },
@@ -325,7 +339,9 @@ export default {
     },
     async submit() {
       this.saveAttendee(this.localizedForm);
-      useRfidStore().clearCardId();
+      const rfidStore = useRfidStore();
+      rfidStore.clearCardId();
+      rfidStore.clearParticipant();
       this.form = initializeForm();
       this.dialog = false;
       this.valid = false;
