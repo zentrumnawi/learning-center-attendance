@@ -47,12 +47,17 @@
         <v-btn
           color="primary"
           variant="flat"
-          :disabled="!displayId"
+          :loading="lookingUp"
+          :disabled="!displayId || lookingUp"
           @click="goToForm"
         >
           Weiter zur Anmeldung
         </v-btn>
-        <v-btn variant="text" :disabled="!displayId" @click="clearScan">
+        <v-btn
+          variant="text"
+          :disabled="!displayId || lookingUp"
+          @click="clearScan"
+        >
           Zurücksetzen
         </v-btn>
       </v-card-actions>
@@ -65,21 +70,27 @@ import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useRfidKeyboard } from "@/composables/useRfidKeyboard";
 import { useRfidStore } from "@/stores/rfid";
+import { getAttendeeByCardId } from "@/api/attendees";
 
 const router = useRouter();
 const rfidStore = useRfidStore();
 const captureInput = ref(null);
+const lookingUp = ref(false);
 
 const { listening, lastCardId } = useRfidKeyboard({
   onScan(uid) {
     rfidStore.setCardId(uid);
+    rfidStore.clearParticipant();
   },
 });
 
 const displayId = computed(() => lastCardId.value || rfidStore.cardId);
 
 watch(lastCardId, (uid) => {
-  if (uid) rfidStore.setCardId(uid);
+  if (uid) {
+    rfidStore.setCardId(uid);
+    rfidStore.clearParticipant();
+  }
 });
 
 function focusCapture() {
@@ -102,12 +113,30 @@ onMounted(() => {
 function clearScan() {
   lastCardId.value = null;
   rfidStore.clearCardId();
+  rfidStore.clearParticipant();
   focusCapture();
 }
 
-function goToForm() {
-  if (!displayId.value) return;
-  rfidStore.setCardId(displayId.value);
+async function goToForm() {
+  if (!displayId.value || lookingUp.value) return;
+
+  const cardId = displayId.value;
+  rfidStore.setCardId(cardId);
+  rfidStore.clearParticipant();
+  lookingUp.value = true;
+
+  try {
+    const participant = await getAttendeeByCardId(cardId);
+    if (participant) {
+      rfidStore.setParticipant(participant);
+    }
+  } catch (err) {
+    // No existing participant; continue with empty form.
+    console.warn("Participant lookup failed:", err);
+  } finally {
+    lookingUp.value = false;
+  }
+
   router.push({ name: "Form" });
 }
 </script>
