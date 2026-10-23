@@ -13,18 +13,6 @@
               placeholder="Keine Karte gescannt"
             ></v-text-field>
 
-            <v-text-field
-              v-model="form.pid"
-              :rules="rules.pid"
-              maxlength="8"
-              label="ID"
-              append-icon="mdi-help-circle"
-              persistent-hint
-              placeholder="XX999999"
-              required
-              @click:append="idhelper = true"
-            ></v-text-field>
-
             <v-select
               v-model="form.semester"
               :rules="rules.semester"
@@ -51,21 +39,6 @@
           </v-card-actions>
         </v-card>
       </v-form>
-
-      <v-dialog v-model="idhelper" max-width="600">
-        <v-card>
-          <v-card-title class="headline">ID</v-card-title>
-          <v-card-text>
-            <p>Die ID setzt sich zusammen aus...</p>
-            <ul>
-              <li>den ersten 2 Buchstaben des Vornamens Ihrer Mutter.</li>
-              <li>den 2 Ziffern des Geburts<em>tags</em> Ihrer Mutter.</li>
-              <li>2 Ziffern Ihres eigenen Geburts<em>monats</em>.</li>
-              <li>2 Ziffern der Nummer Ihres Fachbereichs.</li>
-            </ul>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
     </template>
 
     <template #[`item.2`]>
@@ -150,10 +123,6 @@
                     form.cardId || "—"
                   }}</v-list-item-title>
                 </v-list-item>
-                <v-list-item>
-                  <v-list-item-subtitle>ID</v-list-item-subtitle>
-                  <v-list-item-title>{{ form.pid }}</v-list-item-title>
-                </v-list-item>
                 <v-divider></v-divider>
                 <v-list-item>
                   <v-list-item-subtitle>Studienfach</v-list-item-subtitle>
@@ -229,7 +198,6 @@ function initializeForm(cardId = "", participant = null, departments = []) {
   const prefill = mapParticipantToFormFields(participant, departments);
   return {
     cardId: cardId || prefill.cardId || "",
-    pid: "",
     start: isBefore(setHours(new Date(), 8), subHours(new Date(), 2))
       ? subHours(new Date(), 2)
       : setHours(setMinutes(new Date(), 0), 8),
@@ -265,15 +233,10 @@ export default {
       courses_selected: [],
       semester: ["1", "2", "3", "4", "5", "6", "7+"],
       dialog: false,
-      idhelper: false,
       valid: true,
       valid2: true,
       disabled: 0,
       rules: {
-        pid: [
-          (v) => !!v || "Bitte geben Sie Ihre persönlichen 8 stellige ID an",
-          (v) => v.length === 8 || "Ihre ID muss 8 Zeichen lang sein",
-        ],
         time: [(v) => !!v || "Bitte geben Sie Ihre Anwesenheitszeit an"],
         semester: [
           (v) => !!v || "Bitte geben Sie Ihr aktuelles Fachsemester an",
