@@ -193,6 +193,7 @@ import { useRfidStore } from "@/stores/rfid";
 import { useCoursesStore } from "@/stores/courses";
 import { useDepartmentsStore } from "@/stores/departments";
 import { mapParticipantToFormFields } from "@/api/attendees";
+import { buildVisitPayload, submitVisit } from "@/api/visits";
 
 function initializeForm(cardId = "", participant = null, departments = []) {
   const prefill = mapParticipantToFormFields(participant, departments);
@@ -301,6 +302,14 @@ export default {
       this.$refs.form_coursemath.resetValidation();
     },
     async submit() {
+      try {
+        const payload = buildVisitPayload(this.form, this.departments);
+        await submitVisit(payload);
+      } catch (err) {
+        console.error("Visit submit failed:", err);
+        return;
+      }
+
       this.saveAttendee(this.localizedForm);
       const rfidStore = useRfidStore();
       rfidStore.clearCardId();
