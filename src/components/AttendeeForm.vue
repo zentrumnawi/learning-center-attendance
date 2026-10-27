@@ -49,10 +49,27 @@
           </v-card-title>
 
           <v-card-text>
+            <div class="d-flex align-center justify-center ga-3 mb-4">
+              <span :class="{ 'font-weight-bold': courseScope === 'Maths' }"
+                >Mathematik</span
+              >
+              <v-switch
+                v-model="courseScope"
+                false-value="MATHS"
+                true-value="CHEMISTRY"
+                hide-details
+                density="compact"
+                color="primary"
+                class="ma-0"
+              ></v-switch>
+              <span :class="{ 'font-weight-bold': courseScope === 'CHEMISTRY' }"
+                >Chemie</span
+              >
+            </div>
             <v-select
               :disabled="form.generalQuestion"
               v-model="form.courses"
-              :items="courses"
+              :items="filteredCourses"
               chips
               closable-chips
               label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
@@ -232,6 +249,7 @@ export default {
       ],
       form: initializeForm(rfidStore.cardId, rfidStore.participant),
       courses_selected: [],
+      courseScope: "MATHS",
       semester: ["1", "2", "3", "4", "5", "6", "7+"],
       dialog: false,
       valid: true,
@@ -249,6 +267,11 @@ export default {
   computed: {
     ...mapState(useCoursesStore, ["courses"]),
     ...mapState(useDepartmentsStore, ["departments"]),
+    filteredCourses() {
+      return this.courses.filter(
+        (c) => c.scope === this.courseScope || c.scope === "NO_SCOPE",
+      );
+    },
     maxStartTime() {
       return format(subMinutes(this.form.end, 10), "HH:mm");
     },
@@ -261,6 +284,12 @@ export default {
         start: this.form.start.toString(),
         end: this.form.end.toString(),
       };
+    },
+  },
+  watch: {
+    courseScope() {
+      const allowedIds = new Set(this.filteredCourses.map((c) => c.id));
+      this.form.courses = this.form.courses.filter((id) => allowedIds.has(id));
     },
   },
   async created() {
@@ -291,7 +320,13 @@ export default {
         return "Allgemeine Frage, keine spezielle Lehrveranstaltung";
       }
       return courselist
-        .map((course) => this.courses.find((c) => c.id === course).name)
+        .map((courseId) => this.courses.find((c) => c.id === courseId))
+        .filter(
+          (course) =>
+            course &&
+            (course.scope === this.courseScope || course.scope === "NO_SCOPE"),
+        )
+        .map((course) => course.name)
         .join(", ");
     },
     next() {
@@ -315,6 +350,7 @@ export default {
       rfidStore.clearCardId();
       rfidStore.clearParticipant();
       this.form = initializeForm();
+      this.courseScope = "MATHS";
       this.dialog = false;
       this.valid = false;
       this.stepper = 1;
