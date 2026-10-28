@@ -1,196 +1,200 @@
 <template>
-  <v-stepper v-model="stepper" :items="steps" item-title="label" hide-actions>
-    <template #[`item.1`]>
-      <v-form ref="form_studinfo" v-model="valid">
+  <div>
+    <v-btn class="mb-4" to="/kiosk">Zum Einscannen</v-btn>
+    <v-stepper v-model="stepper" :items="steps" item-title="label" hide-actions>
+      <template #[`item.1`]>
+        <v-form ref="form_studinfo" v-model="valid">
+          <v-card>
+            <v-card-text>
+              <v-text-field
+                v-model="form.cardId"
+                label="Card-ID"
+                readonly
+                persistent-hint
+                hint="Wird vom RFID-Kiosk übernommen"
+                placeholder="Keine Karte gescannt"
+              ></v-text-field>
+
+              <v-select
+                v-model="form.semester"
+                :rules="rules.semester"
+                :items="semester"
+                label="Fachsemester"
+                required
+              ></v-select>
+
+              <v-select
+                v-model="form.faculty"
+                :items="departments"
+                :rules="rules.faculty"
+                label="Studiengang"
+                required
+                item-title="name"
+                item-value="name"
+              ></v-select>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-btn color="primary" @click="next" :disabled="!valid"
+                >Weiter</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </v-form>
+      </template>
+
+      <template #[`item.2`]>
+        <v-form ref="form_coursemath" v-model="valid2">
+          <v-card>
+            <v-card-title class="justify-center">
+              <h2>Lehrveranstaltung(en)</h2>
+            </v-card-title>
+
+            <v-card-text>
+              <div class="d-flex align-center justify-center ga-3 mb-4">
+                <span :class="{ 'font-weight-bold': courseScope === 'Maths' }"
+                  >Mathematik</span
+                >
+                <v-switch
+                  v-model="courseScope"
+                  false-value="MATHS"
+                  true-value="CHEMISTRY"
+                  hide-details
+                  density="compact"
+                  color="primary"
+                  class="ma-0"
+                ></v-switch>
+                <span
+                  :class="{ 'font-weight-bold': courseScope === 'CHEMISTRY' }"
+                  >Chemie</span
+                >
+              </div>
+              <v-select
+                :disabled="form.generalQuestion"
+                v-model="form.courses"
+                :items="filteredCourses"
+                chips
+                closable-chips
+                label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
+                item-title="name"
+                item-value="id"
+                multiple
+              >
+                <template #item="{ item, props }">
+                  <v-list-item v-bind="props">
+                    ({{ item.raw.department_name }})
+                  </v-list-item>
+                </template>
+              </v-select>
+              <v-checkbox
+                :disabled="form.courses.length > 0"
+                v-model="form.generalQuestion"
+                label="Allgemeine Frage, keine spezielle Lehrveranstaltung"
+              ></v-checkbox>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-btn color="primary" @click="next" :disabled="!valid2"
+                >Weiter</v-btn
+              >
+              <v-btn flat @click="previous">Zurück</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-form>
+      </template>
+
+      <template #[`item.3`]>
         <v-card>
           <v-card-text>
-            <v-text-field
-              v-model="form.cardId"
-              label="Card-ID"
-              readonly
-              persistent-hint
-              hint="Wird vom RFID-Kiosk übernommen"
-              placeholder="Keine Karte gescannt"
-            ></v-text-field>
-
-            <v-select
-              v-model="form.semester"
-              :rules="rules.semester"
-              :items="semester"
-              label="Fachsemester"
+            <time-input
+              v-model="form.start"
+              :max="maxStartTime"
+              label="Startzeit"
               required
-            ></v-select>
-
-            <v-select
-              v-model="form.faculty"
-              :items="departments"
-              :rules="rules.faculty"
-              label="Studiengang"
+            ></time-input>
+            <time-input
+              v-model="form.end"
+              :min="minEndTime"
+              label="Endzeit"
               required
-              item-title="name"
-              item-value="name"
-            ></v-select>
+            ></time-input>
+            <v-textarea
+              v-model="form.comments"
+              label="Kommentarfeld"
+              no-resize
+            ></v-textarea>
           </v-card-text>
 
           <v-card-actions>
-            <v-btn color="primary" @click="next" :disabled="!valid"
-              >Weiter</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-form>
-    </template>
-
-    <template #[`item.2`]>
-      <v-form ref="form_coursemath" v-model="valid2">
-        <v-card>
-          <v-card-title class="justify-center">
-            <h2>Lehrveranstaltung(en)</h2>
-          </v-card-title>
-
-          <v-card-text>
-            <div class="d-flex align-center justify-center ga-3 mb-4">
-              <span :class="{ 'font-weight-bold': courseScope === 'Maths' }"
-                >Mathematik</span
-              >
-              <v-switch
-                v-model="courseScope"
-                false-value="MATHS"
-                true-value="CHEMISTRY"
-                hide-details
-                density="compact"
-                color="primary"
-                class="ma-0"
-              ></v-switch>
-              <span :class="{ 'font-weight-bold': courseScope === 'CHEMISTRY' }"
-                >Chemie</span
-              >
-            </div>
-            <v-select
-              :disabled="form.generalQuestion"
-              v-model="form.courses"
-              :items="filteredCourses"
-              chips
-              closable-chips
-              label="Zu welchen Lehrveranstaltungen haben Sie heute gearbeitet?"
-              item-title="name"
-              item-value="id"
-              multiple
-            >
-              <template #item="{ item, props }">
-                <v-list-item v-bind="props">
-                  ({{ item.raw.department_name }})
-                </v-list-item>
+            <v-dialog v-model="dialog" persistent max-width="500">
+              <template #activator="{ props }">
+                <v-btn color="primary" v-bind="props">Absenden</v-btn>
               </template>
-            </v-select>
-            <v-checkbox
-              :disabled="form.courses.length > 0"
-              v-model="form.generalQuestion"
-              label="Allgemeine Frage, keine spezielle Lehrveranstaltung"
-            ></v-checkbox>
-          </v-card-text>
 
-          <v-card-actions>
-            <v-btn color="primary" @click="next" :disabled="!valid2"
-              >Weiter</v-btn
-            >
-            <v-btn flat @click="previous">Zurück</v-btn>
+              <v-card>
+                <v-card-title class="headline" primary-title
+                  >Angaben bestätigen</v-card-title
+                >
+
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-subtitle>Card-ID</v-list-item-subtitle>
+                    <v-list-item-title>{{
+                      form.cardId || "—"
+                    }}</v-list-item-title>
+                  </v-list-item>
+                  <v-divider></v-divider>
+                  <v-list-item>
+                    <v-list-item-subtitle>Studienfach</v-list-item-subtitle>
+                    <v-list-item-title>{{ form.faculty }}</v-list-item-title>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-subtitle>Fachsemester</v-list-item-subtitle>
+                    <v-list-item-title>{{ form.semester }}</v-list-item-title>
+                  </v-list-item>
+
+                  <v-divider></v-divider>
+
+                  <v-list-item>
+                    <v-list-item-subtitle>Startzeit</v-list-item-subtitle>
+                    <v-list-item-title>{{
+                      formatTime(form.start)
+                    }}</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-subtitle>Endzeit</v-list-item-subtitle>
+                    <v-list-item-title>{{
+                      formatTime(form.end)
+                    }}</v-list-item-title>
+                  </v-list-item>
+
+                  <v-divider></v-divider>
+
+                  <v-list-item>
+                    <v-list-item-subtitle
+                      >Lehrveranstaltungen</v-list-item-subtitle
+                    >
+                    <v-list-item-title>{{
+                      formatCourselist(form.courses)
+                    }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+
+                <v-card-text>Sind die Angaben korrekt?</v-card-text>
+
+                <v-card-actions>
+                  <v-btn class="primary" @click="submit">Ja</v-btn>
+                  <v-btn @click="dialog = false" flat>Nein</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+            <v-btn flat @click="stepper -= 1">Zurück</v-btn>
           </v-card-actions>
         </v-card>
-      </v-form>
-    </template>
-
-    <template #[`item.3`]>
-      <v-card>
-        <v-card-text>
-          <time-input
-            v-model="form.start"
-            :max="maxStartTime"
-            label="Startzeit"
-            required
-          ></time-input>
-          <time-input
-            v-model="form.end"
-            :min="minEndTime"
-            label="Endzeit"
-            required
-          ></time-input>
-          <v-textarea
-            v-model="form.comments"
-            label="Kommentarfeld"
-            no-resize
-          ></v-textarea>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-dialog v-model="dialog" persistent max-width="500">
-            <template #activator="{ props }">
-              <v-btn color="primary" v-bind="props">Absenden</v-btn>
-            </template>
-
-            <v-card>
-              <v-card-title class="headline" primary-title
-                >Angaben bestätigen</v-card-title
-              >
-
-              <v-list>
-                <v-list-item>
-                  <v-list-item-subtitle>Card-ID</v-list-item-subtitle>
-                  <v-list-item-title>{{
-                    form.cardId || "—"
-                  }}</v-list-item-title>
-                </v-list-item>
-                <v-divider></v-divider>
-                <v-list-item>
-                  <v-list-item-subtitle>Studienfach</v-list-item-subtitle>
-                  <v-list-item-title>{{ form.faculty }}</v-list-item-title>
-                </v-list-item>
-
-                <v-list-item>
-                  <v-list-item-subtitle>Fachsemester</v-list-item-subtitle>
-                  <v-list-item-title>{{ form.semester }}</v-list-item-title>
-                </v-list-item>
-
-                <v-divider></v-divider>
-
-                <v-list-item>
-                  <v-list-item-subtitle>Startzeit</v-list-item-subtitle>
-                  <v-list-item-title>{{
-                    formatTime(form.start)
-                  }}</v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-subtitle>Endzeit</v-list-item-subtitle>
-                  <v-list-item-title>{{
-                    formatTime(form.end)
-                  }}</v-list-item-title>
-                </v-list-item>
-
-                <v-divider></v-divider>
-
-                <v-list-item>
-                  <v-list-item-subtitle
-                    >Lehrveranstaltungen</v-list-item-subtitle
-                  >
-                  <v-list-item-title>{{
-                    formatCourselist(form.courses)
-                  }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-
-              <v-card-text>Sind die Angaben korrekt?</v-card-text>
-
-              <v-card-actions>
-                <v-btn class="primary" @click="submit">Ja</v-btn>
-                <v-btn @click="dialog = false" flat>Nein</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-btn flat @click="stepper -= 1">Zurück</v-btn>
-        </v-card-actions>
-      </v-card>
-    </template>
-  </v-stepper>
+      </template>
+    </v-stepper>
+  </div>
 </template>
 
 <script>

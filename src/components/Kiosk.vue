@@ -60,6 +60,10 @@
         >
           Zurücksetzen
         </v-btn>
+        <v-spacer></v-spacer>
+        <v-btn variant="text" to="/manual-card" :disabled="lookingUp">
+          Keine Karte dabei?
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-container>
