@@ -30,7 +30,7 @@ const routes = [
     component: Admin,
   },
   {
-    path: "/add-student",
+    path: "/registration",
     name: "Form",
     component: Form,
   },
