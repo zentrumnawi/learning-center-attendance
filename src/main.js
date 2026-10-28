@@ -9,7 +9,6 @@ import "@mdi/font/css/materialdesignicons.css";
 import { aliases, mdi } from "vuetify/iconsets/mdi";
 
 import App from "./App.vue";
-import Admin from "@/components/Admin.vue";
 import Form from "@/components/AttendeeForm.vue";
 import Kiosk from "@/components/Kiosk.vue";
 
@@ -24,11 +23,6 @@ const vuetify = createVuetify({
 });
 
 const routes = [
-  {
-    path: "/admin",
-    name: "Admin",
-    component: Admin,
-  },
   {
     path: "/registration",
     name: "Form",

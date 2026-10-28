@@ -21,8 +21,8 @@
     <v-footer app dark color="primary darken-1">
       <v-layout text-left ml-4>
         <v-col xs12>
-          &copy; 2019&nbsp;&nbsp;|&nbsp;&nbsp;
-          <router-link to="/admin">
+          &copy; 2026&nbsp;&nbsp;|&nbsp;&nbsp;
+          <router-link to="/registration">
             <img
               height="20px"
               src="/Icon_ZentrumNaturwissenschaften.svg"
