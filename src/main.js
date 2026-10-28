@@ -11,6 +11,7 @@ import { aliases, mdi } from "vuetify/iconsets/mdi";
 import App from "./App.vue";
 import Form from "@/components/AttendeeForm.vue";
 import Kiosk from "@/components/Kiosk.vue";
+import ManualCardEntry from "@/components/ManualCardEntry.vue";
 
 const vuetify = createVuetify({
   icons: {
@@ -32,6 +33,11 @@ const routes = [
     path: "/kiosk",
     name: "Kiosk",
     component: Kiosk,
+  },
+  {
+    path: "/manual-card",
+    name: "ManualCardEntry",
+    component: ManualCardEntry,
   },
 ];
 
