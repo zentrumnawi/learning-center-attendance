@@ -9,9 +9,9 @@ import "@mdi/font/css/materialdesignicons.css";
 import { aliases, mdi } from "vuetify/iconsets/mdi";
 
 import App from "./App.vue";
-import Admin from "@/components/Admin.vue";
 import Form from "@/components/AttendeeForm.vue";
 import Kiosk from "@/components/Kiosk.vue";
+import ManualCardEntry from "@/components/ManualCardEntry.vue";
 
 const vuetify = createVuetify({
   icons: {
@@ -25,12 +25,7 @@ const vuetify = createVuetify({
 
 const routes = [
   {
-    path: "/admin",
-    name: "Admin",
-    component: Admin,
-  },
-  {
-    path: "/add-student",
+    path: "/registration",
     name: "Form",
     component: Form,
   },
@@ -38,6 +33,11 @@ const routes = [
     path: "/kiosk",
     name: "Kiosk",
     component: Kiosk,
+  },
+  {
+    path: "/manual-card",
+    name: "ManualCardEntry",
+    component: ManualCardEntry,
   },
 ];
 
