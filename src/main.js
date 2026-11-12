@@ -12,6 +12,8 @@ import App from "./App.vue";
 import Form from "@/components/AttendeeForm.vue";
 import Kiosk from "@/components/Kiosk.vue";
 import ManualCardEntry from "@/components/ManualCardEntry.vue";
+import { setCsrfTokenProvider } from "@/api/http";
+import { useAuthStore } from "@/stores/auth";
 
 const vuetify = createVuetify({
   icons: {
@@ -49,4 +51,14 @@ export const router = createRouter({
   routes,
 });
 
-createApp(App).use(router).use(pinia).use(vuetify).mount("#app");
+const app = createApp(App);
+app.use(router).use(pinia).use(vuetify);
+
+setCsrfTokenProvider(() => useAuthStore().csrfToken);
+useAuthStore()
+  .fetchCsrfToken()
+  .catch((err) => {
+    console.warn("CSRF token bootstrap failed:", err);
+  });
+
+app.mount("#app");
