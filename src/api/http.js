@@ -8,6 +8,43 @@ function isUnsafeMethod(method) {
   return method !== "GET";
 }
 
+function readCsrfCookie() {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]*)/);
+  console.log("document.cookie", document.cookie);
+  console.log("match", match);
+  const value = match?.[1] ? decodeURIComponent(match[1]) : null;
+  return value || null;
+}
+
+/*
+ * Prefer the browser cookie over the store: admin login in another tab can
+ * rotate csrftoken while the store still holds the startup value.
+ */
+function getCsrfToken() {
+  return readCsrfCookie() || csrfTokenProvider?.() || null;
+}
+
+async function ensureCsrfToken() {
+  const existing = getCsrfToken();
+  if (existing) return existing;
+
+  try {
+    const res = await fetch("/api/auth/csrf/", {
+      method: "GET",
+      credentials: "include",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return getCsrfToken();
+
+    const data = await res.json().catch(() => null);
+    return readCsrfCookie() || data?.csrfToken || null;
+  } catch {
+    return getCsrfToken();
+  }
+}
+
 export class HttpError extends Error {
   constructor(message, opts) {
     super(message);
@@ -34,7 +71,7 @@ export async function httpJson(path, opts) {
   const method = opts?.method ?? "GET";
 
   if (isUnsafeMethod(method)) {
-    const csrfToken = csrfTokenProvider?.() ?? null;
+    const csrfToken = await ensureCsrfToken();
     if (csrfToken) {
       headers["X-CSRFToken"] = csrfToken;
     }
@@ -46,8 +83,7 @@ export async function httpJson(path, opts) {
     body = JSON.stringify(opts.body);
   }
 
-  let res;
-  res = await fetch(path, {
+  const res = await fetch(path, {
     method,
     headers,
     body,
