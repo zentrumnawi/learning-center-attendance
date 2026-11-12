@@ -27,6 +27,10 @@ const vuetify = createVuetify({
 
 const routes = [
   {
+    path: "/",
+    redirect: "/kiosk",
+  },
+  {
     path: "/registration",
     name: "Form",
     component: Form,
